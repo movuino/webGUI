@@ -55,7 +55,7 @@ void list_files(){
 // lorsque le ticker est ativé, envoie les valeurs de l'accéléromètre au websocket et en serial
 void onTick() {
   accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-  webSocket.sendTXT(0, (String)ax+" "+(String)ay+" "+(String)az); // ne fonctionne pas dans WebSocketEvent
+  webSocket.sendTXT(0, "accéléromètre: "+(String)ax+" "+(String)ay+" "+(String)az); // ne fonctionne pas dans WebSocketEvent
     Serial.print(ax); 
     Serial.print(" ");
     Serial.print(ay);
