@@ -5,7 +5,27 @@
    <script type="text/javascript" src="/js/smoothie.js"></script>
     <script type="text/javascript">
 
-      // Randomly add a data point every 500ms
+      function startSockets() {
+		websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+		websock.onopen = function(evt) { console.log('websock open'); };
+		websock.onclose = function(evt) { console.log('websock close'); };
+		websock.onmessage = function(evt) {console.log(evt);};
+		websock.onerror = function(evt) { console.log(evt); };
+/*  websock.onmessage = function(evt) {
+    console.log(evt);
+    var e = document.getElementById();
+    if (evt.data === 'avance') {
+      e.style.color = 'red';
+    }
+    else if (evt.data === 'halte') {
+      e.style.color = 'black';
+    }
+    else {
+      console.log('unknown event');   
+    } 
+  };  */
+}
+	  // Randomly add a data point every 500ms
       var random = new TimeSeries();
       setInterval(function() {
 		// Call a function repetatively with 5 Second interval
@@ -13,6 +33,7 @@
 		}, 500); //5000mSeconds update rate
       
       function createTimeline() {
+		startSockets();
         var chart = new SmoothieChart();
         chart.addTimeSeries(random, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 });
         chart.streamTo(document.getElementById("chart"), 500);
@@ -42,7 +63,7 @@
 }
     </script>
   </head>
-  <body onload="createTimeline()">
+  <body onload="createTimeline();">
 
     <p>The <em>hello world</em> of <a href="../">Smoothie Charts</a>. View source.</p>
 

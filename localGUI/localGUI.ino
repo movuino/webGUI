@@ -6,7 +6,11 @@
 #include "FS.h"
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
+#include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
+#include <WebSocketsServer.h>
+#include <Hash.h>
+
 #define LED 2  //On board LED
 
 
@@ -16,6 +20,8 @@ const char *password = "";
 
 
 ESP8266WebServer server(80); //Server on port 80
+WebSocketsServer webSocket = WebSocketsServer(81);
+
 void list_files(){
     Serial.print("Listing files");
     Dir dir = SPIFFS.openDir("/js/");
@@ -31,6 +37,68 @@ void list_files(){
        Serial.println(f.size());
       }*/
 }
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
+{
+  Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
+  switch(type) {
+    case WStype_DISCONNECTED:
+      Serial.printf("[%u] Disconnected!\r\n", num);
+      break;
+    case WStype_CONNECTED:
+      {
+        IPAddress ip = webSocket.remoteIP(num);
+        Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\r\n", num, ip[0], ip[1], ip[2], ip[3], payload);
+        // payload = contenu du message envoyé
+        // Send the current LED status
+    /*    if (movSTATUS) {
+          Serial.println("movSTATUS");
+          webSocket.sendTXT(num, avance, strlen(avance));
+        }
+        else {
+          webSocket.sendTXT(num, halte, strlen(halte));
+          Serial.println("movSTATUS else");
+        }  */
+      }
+      break;
+    case WStype_TEXT:
+      Serial.printf("[%u] get Text: %s\r\n", num, payload);
+
+      /*if (strcmp(avance, (const char *)payload) == 0) {
+       // writeLED (true);      
+        A();
+      }
+      else if (strcmp(halte, (const char *)payload) == 0) {
+      //  writeLED(false);     
+         S();  
+      }
+      else if (strcmp(droite, (const char *)payload) == 0) {  
+         D();  
+      }      
+      else if (strcmp(gauche, (const char *)payload) == 0) {
+        G();
+      }
+      else if (strcmp(recule, (const char *)payload) == 0) {  
+         R();  
+      }      
+      else {
+        Serial.println("Unknown command");
+      }*/
+      // send data to all connected clients
+      //webSocket.broadcastTXT(payload, length);  // envoie le message reçu à tous les appareils connectés
+      break;
+    case WStype_BIN:
+      Serial.printf("[%u] get binary length: %u\r\n", num, length);
+      hexdump(payload, length);
+
+      // echo data back to browser
+      webSocket.sendBIN(num, payload, length);
+      break;
+    default:
+      Serial.printf("Invalid WStype [%d]\r\n", type);
+      break;
+  }
+}
+
 //===============================================================
 // This routine is executed when you open its IP in browser
 //===============================================================
@@ -72,6 +140,13 @@ void setup(void){
   //Onboard LED port Direction output
   pinMode(LED,OUTPUT); 
   
+  if (!MDNS.begin("Movuino-001")) {
+    Serial.println("Error setting up MDNS responder!");
+    while (1) {
+      delay(1000);
+    }
+  }
+  Serial.println("mDNS responder started");
  // IPAddress myIP = WiFi.softAPIP();
   //Serial.print("AP IP address: ");
   //Serial.println(myIP);
@@ -79,7 +154,10 @@ void setup(void){
   server.on("/readADC", handleADC); //This page is called by java Script AJAX
   server.serveStatic("/js", SPIFFS, "/js");
   server.serveStatic("/", SPIFFS, "/index.html");
+  
   server.begin();
+  webSocket.begin();
+  webSocket.onEvent(webSocketEvent);
   Serial.println("HTTP server started");
  
 }
@@ -87,5 +165,6 @@ void setup(void){
 //                     LOOP
 //==============================================================
 void loop(void){
+  webSocket.loop();
   server.handleClient();          //Handle client requests
 }
