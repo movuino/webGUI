@@ -30,6 +30,7 @@
       setInterval(function() {
 		// Call a function repetatively with 5 Second interval
 		getData();
+		websock.send("requestIMU");
 		}, 500); //5000mSeconds update rate
       
       function createTimeline() {
@@ -39,6 +40,7 @@
         chart.streamTo(document.getElementById("chart"), 500);
       }
 	  function getData() {
+		
 		var xhttp = new XMLHttpRequest();
 	    xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {

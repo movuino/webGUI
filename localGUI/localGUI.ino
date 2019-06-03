@@ -22,6 +22,8 @@ const char *password = "";
 ESP8266WebServer server(80); //Server on port 80
 WebSocketsServer webSocket = WebSocketsServer(81);
 
+const char command[] = "requestIMU";
+
 void list_files(){
     Serial.print("Listing files");
     Dir dir = SPIFFS.openDir("/js/");
@@ -62,11 +64,11 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       break;
     case WStype_TEXT:
       Serial.printf("[%u] get Text: %s\r\n", num, payload);
-
-      /*if (strcmp(avance, (const char *)payload) == 0) {
-       // writeLED (true);      
-        A();
+      //received request of datza
+      if (strcmp(command, (const char *)payload) == 0) {
+        //webSocket.sendBIN(num, payload, length);
       }
+      /*
       else if (strcmp(halte, (const char *)payload) == 0) {
       //  writeLED(false);     
          S();  
@@ -146,6 +148,9 @@ void setup(void){
       delay(1000);
     }
   }
+  MDNS.addService("ws", "tcp", 81);
+  MDNS.addService("http", "tcp", 80);
+  
   Serial.println("mDNS responder started");
  // IPAddress myIP = WiFi.softAPIP();
   //Serial.print("AP IP address: ");
