@@ -11,12 +11,25 @@
 #include <WebSocketsServer.h>
 #include <Hash.h>
 
+#include "Wire.h"
+#include "I2Cdev.h"
+#include "MPU6050.h"
+#include <Ticker.h>  //Ticker Library
+
+
 #define LED 2  //On board LED
 
 
 /* Set these to your desired credentials. */
 const char *ssid = "Movuino-001";
 const char *password = "";
+
+MPU6050 accelgyro;
+
+int16_t ax, ay, az; 
+int16_t gx, gy, gz;
+
+Ticker ticker1;
 
 
 ESP8266WebServer server(80); //Server on port 80
@@ -39,6 +52,17 @@ void list_files(){
        Serial.println(f.size());
       }*/
 }
+// lorsque le ticker est ativé, envoie les valeurs de l'accéléromètre au websocket et en serial
+void onTick() {
+  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  webSocket.sendTXT(0, (String)ax+" "+(String)ay+" "+(String)az); // ne fonctionne pas dans WebSocketEvent
+    Serial.print(ax); 
+    Serial.print(" ");
+    Serial.print(ay);
+    Serial.print(" ");
+    Serial.println(az);
+}
+
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 {
   Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
@@ -123,6 +147,18 @@ void handleADC() {
 //==============================================================
 void setup(void){
   Serial.begin(115200);
+
+    // join I2C bus (I2Cdev library doesn't do this automatically)
+    Wire.begin();
+
+    // initialize device
+    Serial.println("Initializing I2C devices...");
+    accelgyro.initialize();
+
+    // verify connection
+    Serial.println("Testing device connections...");
+    Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
+    
   bool result = SPIFFS.begin();
   Serial.println(result);
   list_files();
@@ -164,6 +200,8 @@ void setup(void){
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
   Serial.println("HTTP server started");
+
+   ticker1.attach(1, onTick); // le ticker s'active toutes les secondes et exécute onTick
  
 }
 //==============================================================
