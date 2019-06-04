@@ -4,29 +4,48 @@
     
    <script type="text/javascript" src="/js/smoothie.js"></script>
     <script type="text/javascript">
+	
+	var ax;
+	var ay;
+	var az;
+	
+	function splitString(stringToSplit, separator) {
+		var arrayOfStrings = stringToSplit.split(separator);
+		//for (var i=0; i < arrayOfStrings.length; i++)
+		//print(arrayOfStrings[i] + " / ");
+        var b = document.getElementById('example');
+		ax = arrayOfStrings[1];
+		ay = arrayOfStrings[2];
+		az = arrayOfStrings[3];
+		b.innerHTML = "<p> ax = " + ax + " , ay = " + ay + " , az = " + az + "</p>";		
+		}	
+		
 
-      function startSockets() {
+    function startSockets() {
 		websock = new WebSocket('ws://' + window.location.hostname + ':81/');
 		websock.onopen = function(evt) { console.log('websock open'); };
 		websock.onclose = function(evt) { console.log('websock close'); };
-		websock.onmessage = function(evt) {console.log(evt);};
+	//	websock.onmessage = function(evt) {console.log(evt);};
 		websock.onerror = function(evt) { console.log(evt); };
-/*  websock.onmessage = function(evt) {
-    console.log(evt);
-    var e = document.getElementById();
-    if (evt.data === 'avance') {
-      e.style.color = 'red';
-    }
-    else if (evt.data === 'halte') {
-      e.style.color = 'black';
-    }
-    else {
-      console.log('unknown event');   
-    } 
-  };  */
-}
+		websock.onmessage = function(evt) {
+		var dataAccel = evt.data
+		var espace = " ";
+		splitString(dataAccel, espace);
+
+		console.log(evt);
+
+		};  
+		}
+
+		
+	
+		
 	  // Randomly add a data point every 500ms
       var random = new TimeSeries();
+	  Serieax = new TimeSeries();
+	  Serieay = new TimeSeries();
+	  Serieaz = new TimeSeries();
+	  
       setInterval(function() {
 		// Call a function repetatively with 5 Second interval
 		getData();
@@ -36,7 +55,10 @@
       function createTimeline() {
 		startSockets();
         var chart = new SmoothieChart();
-        chart.addTimeSeries(random, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 });
+        chart.addTimeSeries(random, { strokeStyle: 'rgba(255, 255, 255, 1)', fillStyle: 'rgba(0, 0, 0, 0.2)', lineWidth: 2 });
+		chart.addTimeSeries(Serieax, { strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.2)', lineWidth: 2 });
+		chart.addTimeSeries(Serieay, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 });
+		chart.addTimeSeries(Serieaz, { strokeStyle: 'rgba(0, 0, 255, 1)', fillStyle: 'rgba(0, 0, 255, 0.2)', lineWidth: 2 });
         chart.streamTo(document.getElementById("chart"), 500);
       }
 	  function getData() {
@@ -48,7 +70,11 @@
 	//var time = new Date().toLocaleTimeString();
 	var ADCValue = this.responseText;
 	 // values.push(ADCValue);
-	  random.append(new Date().getTime(),ADCValue);
+		random.append(new Date().getTime(),ADCValue);
+		Serieax.append(new Date().getTime(),ax);
+		Serieay.append(new Date().getTime(),ay);
+		Serieaz.append(new Date().getTime(),az);
+	  
       //timeStamp.push(time);
       //showGraph();	//Update Graphs
 	//Update Data Table
@@ -65,11 +91,14 @@
 }
     </script>
   </head>
-  <body onload="createTimeline();">
+  <body onload="createTimeline();javascript:start();">
 
     <p>The <em>hello world</em> of <a href="../">Smoothie Charts</a>. View source.</p>
 
     <canvas id="chart" width="400" height="100"></canvas>
+	
+	<p> <span id="example"></span></p>
+	
 
   </body>
 </html>
