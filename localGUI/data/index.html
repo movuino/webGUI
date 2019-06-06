@@ -41,7 +41,7 @@
 	
 		
 	  // Randomly add a data point every 500ms
-      var random = new TimeSeries();
+//      var random = new TimeSeries();
 	  Serieax = new TimeSeries();
 	  Serieay = new TimeSeries();
 	  Serieaz = new TimeSeries();
@@ -50,27 +50,27 @@
 		// Call a function repetatively with 5 Second interval
 		getData();
 		websock.send("requestIMU");
-		}, 500); //5000mSeconds update rate
+		}, 50); //5000mSeconds update rate
       
       function createTimeline() {
 		startSockets();
         var chart = new SmoothieChart();
-        chart.addTimeSeries(random, { strokeStyle: 'rgba(255, 255, 255, 1)', fillStyle: 'rgba(0, 0, 0, 0.2)', lineWidth: 2 });
+//        chart.addTimeSeries(random, { strokeStyle: 'rgba(255, 255, 255, 1)', fillStyle: 'rgba(0, 0, 0, 0.2)', lineWidth: 2 });
 		chart.addTimeSeries(Serieax, { strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.2)', lineWidth: 2 });
 		chart.addTimeSeries(Serieay, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 });
 		chart.addTimeSeries(Serieaz, { strokeStyle: 'rgba(0, 0, 255, 1)', fillStyle: 'rgba(0, 0, 255, 0.2)', lineWidth: 2 });
-        chart.streamTo(document.getElementById("chart"), 500);
+        chart.streamTo(document.getElementById("chart"), 50);
       }
 	  function getData() {
 		
-		var xhttp = new XMLHttpRequest();
-	    xhttp.onreadystatechange = function() {
-		if (this.readyState == 4 && this.status == 200) {
+//		var xhttp = new XMLHttpRequest();
+//	    xhttp.onreadystatechange = function() {
+//		if (this.readyState == 4 && this.status == 200) {
      //Push the data in array
 	//var time = new Date().toLocaleTimeString();
-	var ADCValue = this.responseText;
+//	var ADCValue = this.responseText;
 	 // values.push(ADCValue);
-		random.append(new Date().getTime(),ADCValue);
+//		random.append(new Date().getTime(),ADCValue);
 		Serieax.append(new Date().getTime(),ax);
 		Serieay.append(new Date().getTime(),ay);
 		Serieaz.append(new Date().getTime(),az);
@@ -84,10 +84,10 @@
 	  //var cell2 = row.insertCell(1);
 	  //cell1.innerHTML = time;
 	  //cell2.innerHTML = ADCValue;
-    }
-  };
-  xhttp.open("GET", "readADC", true);	//Handle readADC server on ESP8266
-  xhttp.send();
+//    }
+//  };
+//  xhttp.open("GET", "readADC", true);	//Handle readADC server on ESP8266
+//  xhttp.send();
 }
     </script>
   </head>
