@@ -135,13 +135,13 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 void handleRoot() {
   server.send(200, "text/html", "<h1>You are connected</h1>");
 }
-
+/*
 void handleADC() {
  int a = analogRead(A0);
  String adcValue = String(a);
  digitalWrite(LED,!digitalRead(LED)); //Toggle LED on data request ajax
  server.send(200, "text/plane", adcValue); //Send ADC value only to client ajax request
-}
+} */
 //==============================================================
 //                  SETUP
 //==============================================================
@@ -192,7 +192,7 @@ void setup(void){
   //Serial.print("AP IP address: ");
   //Serial.println(myIP);
   //server.on("/", handleRoot);
-  server.on("/readADC", handleADC); //This page is called by java Script AJAX
+//  server.on("/readADC", handleADC); //This page is called by java Script AJAX
   server.serveStatic("/js", SPIFFS, "/js");
   server.serveStatic("/", SPIFFS, "/index.html");
   
@@ -201,7 +201,7 @@ void setup(void){
   webSocket.onEvent(webSocketEvent);
   Serial.println("HTTP server started");
 
-   ticker1.attach(1, onTick); // le ticker s'active toutes les secondes et exécute onTick
+   ticker1.attach_ms(50, onTick); // le ticker s'active toutes les secondes et exécute onTick
  
 }
 //==============================================================
