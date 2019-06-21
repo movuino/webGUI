@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title> controle quadcopter</title>
+  <script>
+
+  	/* fonctions webSocket */
+	function start() {
+  		websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+ 		 websock.onopen = function(evt) { console.log('websock open'); };
+ 		 websock.onclose = function(evt) { console.log('websock close'); };
+ 		 websock.onmessage = function(evt) {console.log(evt);};
+ 		 websock.onerror = function(evt) { console.log(evt); };
+	}
+
+  	function showValueall(newValue)
+                {
+                        document.getElementById("outputTextall").innerHTML=newValue;
+					   
+                        websock.send("4"+newValue);
+                }	
+  </script>
+</head>
+<body onload="javascript:start();">
+  <p> activation</p>
+
+  <p> puissance 4 moteurs </p>
+	<input type="range" id= "inputSlider4" min="0" max="255" value="0" step="5" oninput="showValueall(this.value)" />      
+
+  <p> puissance moteur 1 </p>
+
+  <p> puissance moteur 2 </p>
+
+  <p> puissance moteur 3 </p>
+
+  <p> puissance moteur 4 </p>
+
+</body>
+
+
+</html>
