@@ -1,25 +1,67 @@
 <!doctype html>
 <html>
   <head>
-    
-   <script type="text/javascript" src="/js/smoothie.js"></script>
+  <style>
+   /* Style buttons */
+a {
+  text-decoration: none;
+  display: inline-block;
+  padding: 8px 16px;
+}
+
+a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.previous {
+  background-color: #f1f1f1;
+  color: black;
+}
+
+.next {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.round {
+  border-radius: 50%;
+}
+  .center {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+}
+  .center_top {
+  position: absolute;
+  left: 0;
+  top: 0%;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+}
+  .line1 {
+    //background: orange;
+  position: absolute;
+  left: 0;
+  top: 60px;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+}
+  .center_bottom {
+  position: absolute;
+  left: 0;
+  top: 120px;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+}
+  </style>
     <script type="text/javascript">
-	
-	var ax;
-	var ay;
-	var az;
-	
-	function splitString(stringToSplit, separator) {
-		var arrayOfStrings = stringToSplit.split(separator);
-		//for (var i=0; i < arrayOfStrings.length; i++)
-		//print(arrayOfStrings[i] + " / ");
-        var b = document.getElementById('example');
-		ax = arrayOfStrings[1];
-		ay = arrayOfStrings[2];
-		az = arrayOfStrings[3];
-		b.innerHTML = "<p> ax = " + ax + " , ay = " + ay + " , az = " + az + "</p>";		
-		}	
-		
 
     function startSockets() {
 		websock = new WebSocket('ws://' + window.location.hostname + ':81/');
@@ -30,75 +72,41 @@
 		websock.onmessage = function(evt) {
 		var dataAccel = evt.data
 		var espace = " ";
-		splitString(dataAccel, espace);
-
 		console.log(evt);
 
 		};  
 		}
-
-		
-	
-		
-	  // Randomly add a data point every 500ms
-//      var random = new TimeSeries();
-	  Serieax = new TimeSeries();
-	  Serieay = new TimeSeries();
-	  Serieaz = new TimeSeries();
-	  
-      setInterval(function() {
-		// Call a function repetatively with 5 Second interval
-		getData();
-		websock.send("requestIMU");
-		}, 50); //5000mSeconds update rate
       
-      function createTimeline() {
-		startSockets();
-        var chart = new SmoothieChart();
-//        chart.addTimeSeries(random, { strokeStyle: 'rgba(255, 255, 255, 1)', fillStyle: 'rgba(0, 0, 0, 0.2)', lineWidth: 2 });
-		chart.addTimeSeries(Serieax, { strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.2)', lineWidth: 2 });
-		chart.addTimeSeries(Serieay, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 });
-		chart.addTimeSeries(Serieaz, { strokeStyle: 'rgba(0, 0, 255, 1)', fillStyle: 'rgba(0, 0, 255, 0.2)', lineWidth: 2 });
-        chart.streamTo(document.getElementById("chart"), 50);
-      }
-	  function getData() {
-		
-//		var xhttp = new XMLHttpRequest();
-//	    xhttp.onreadystatechange = function() {
-//		if (this.readyState == 4 && this.status == 200) {
-     //Push the data in array
-	//var time = new Date().toLocaleTimeString();
-//	var ADCValue = this.responseText;
-	 // values.push(ADCValue);
-//		random.append(new Date().getTime(),ADCValue);
-		Serieax.append(new Date().getTime(),ax);
-		Serieay.append(new Date().getTime(),ay);
-		Serieaz.append(new Date().getTime(),az);
-	  
-      //timeStamp.push(time);
-      //showGraph();	//Update Graphs
-	//Update Data Table
-	 // var table = document.getElementById("dataTable");
-	 // var row = table.insertRow(1);	//Add after headings
-	  //var cell1 = row.insertCell(0);
-	  //var cell2 = row.insertCell(1);
-	  //cell1.innerHTML = time;
-	  //cell2.innerHTML = ADCValue;
-//    }
-//  };
-//  xhttp.open("GET", "readADC", true);	//Handle readADC server on ESP8266
-//  xhttp.send();
-}
+	  function up(){
+		websock.send("f");
+		//alert('f');
+	  }
+	  function down(){
+		websock.send("b");
+		//alert('b');
+	  }
+	  function left(){
+		//alert('l');
+		websock.send("1");
+	  }
+	  function right(){
+		websock.send("r");
+		//alert('r');
+	  }
     </script>
   </head>
-  <body onload="createTimeline();javascript:start();">
-
-    <p>The <em>hello world</em> of <a href="../">Smoothie Charts</a>. View source.</p>
-
-    <canvas id="chart" width="400" height="100"></canvas>
+  <body onload="startSockets();">
+    <div class="center_top">
+    <button onclick="up()"><img src="/up.png"></button></div>
+	<br>
+	<div class="line1">
+	<button onclick="left()"><img src="\left.png">  </button>
 	
-	<p> <span id="example"></span></p>
-	
-
+	<button onclick="right()"><img src="\right.png">  </button></div>
+	<br>
+	<div class="center_bottom">
+	<button onclick="down()"><img src="\down.png"></button></div>
+	<a href="#" class="previous round">&#8249;</a>
+    <a href="#" class="next round">&#8250;</a>
   </body>
 </html>

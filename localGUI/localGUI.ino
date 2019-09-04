@@ -52,20 +52,11 @@ void list_files(){
        Serial.println(f.size());
       }*/
 }
-// lorsque le ticker est ativé, envoie les valeurs de l'accéléromètre au websocket et en serial
-void onTick() {
-  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-  webSocket.sendTXT(0, "accéléromètre: "+(String)ax+" "+(String)ay+" "+(String)az); // ne fonctionne pas dans WebSocketEvent
-    Serial.print(ax); 
-    Serial.print(" ");
-    Serial.print(ay);
-    Serial.print(" ");
-    Serial.println(az);
-}
+
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 {
-  Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
+ // Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
   switch(type) {
     case WStype_DISCONNECTED:
       Serial.printf("[%u] Disconnected!\r\n", num);
@@ -73,7 +64,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
     case WStype_CONNECTED:
       {
         IPAddress ip = webSocket.remoteIP(num);
-        Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\r\n", num, ip[0], ip[1], ip[2], ip[3], payload);
+        //Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\r\n", num, ip[0], ip[1], ip[2], ip[3], payload);
         // payload = contenu du message envoyé
         // Send the current LED status
     /*    if (movSTATUS) {
@@ -87,11 +78,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       }
       break;
     case WStype_TEXT:
-      Serial.printf("[%u] get Text: %s\r\n", num, payload);
+      //Serial.printf("[%u] get Text: %s\r\n", num, payload);
+      Serial.printf("%s\n", payload);
       //received request of datza
-      if (strcmp(command, (const char *)payload) == 0) {
+     /* if (strcmp(command, (const char *)payload) == 0) {
         //webSocket.sendBIN(num, payload, length);
-      }
+      }*/
       /*
       else if (strcmp(halte, (const char *)payload) == 0) {
       //  writeLED(false);     
@@ -152,15 +144,11 @@ void setup(void){
     Wire.begin();
 
     // initialize device
-    Serial.println("Initializing I2C devices...");
+   // Serial.println("Initializing I2C devices...");
     accelgyro.initialize();
 
-    // verify connection
-    Serial.println("Testing device connections...");
-    Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
-    
   bool result = SPIFFS.begin();
-  Serial.println(result);
+ // Serial.println(result);
   list_files();
   WiFi.mode(WIFI_AP);  //need both to serve the webpage and take commands via tcp
   IPAddress ip(10,10,10,1);
@@ -173,7 +161,7 @@ void setup(void){
   Serial.print("AP IP address: ");
   Serial.println(myIP);*/
   //WiFi.softAP(ssid, password);   //Connect to your WiFi router
-  Serial.println("");
+//  Serial.println("");
 
   //Onboard LED port Direction output
   pinMode(LED,OUTPUT); 
@@ -187,21 +175,19 @@ void setup(void){
   MDNS.addService("ws", "tcp", 81);
   MDNS.addService("http", "tcp", 80);
   
-  Serial.println("mDNS responder started");
+ // Serial.println("mDNS responder started");
  // IPAddress myIP = WiFi.softAPIP();
   //Serial.print("AP IP address: ");
   //Serial.println(myIP);
   //server.on("/", handleRoot);
 //  server.on("/readADC", handleADC); //This page is called by java Script AJAX
-  server.serveStatic("/js", SPIFFS, "/js");
+  //server.serveStatic("/js", SPIFFS, "/js");
   server.serveStatic("/", SPIFFS, "/index.html");
   
   server.begin();
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
-  Serial.println("HTTP server started");
-
-   ticker1.attach_ms(50, onTick); // le ticker s'active toutes les secondes et exécute onTick
+//  Serial.println("HTTP server started");
  
 }
 //==============================================================
