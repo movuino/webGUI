@@ -2,31 +2,7 @@
 <html>
   <head>
   <style>
-   /* Style buttons */
-a {
-  text-decoration: none;
-  display: inline-block;
-  padding: 8px 16px;
-}
-
-a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.previous {
-  background-color: #f1f1f1;
-  color: black;
-}
-
-.next {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.round {
-  border-radius: 50%;
-}
+   
   .center {
   position: absolute;
   left: 0;
@@ -58,7 +34,7 @@ a:hover {
   top: 120px;
   width: 100%;
   text-align: center;
-  font-size: 18px;
+  font-size: 25px;
 }
   </style>
     <script type="text/javascript">
@@ -97,16 +73,14 @@ a:hover {
   </head>
   <body onload="startSockets();">
     <div class="center_top">
-    <button onclick="up()"><img src="/up.png"></button></div>
+    <button onclick="up()"><img src="/up.png">&#8593;</button></div>
 	<br>
 	<div class="line1">
-	<button onclick="left()"><img src="\left.png">  </button>
+	<button onclick="left()"><img src="\left.png">&#8592;</button>
 	
-	<button onclick="right()"><img src="\right.png">  </button></div>
+	<button onclick="right()"><img src="\right.png">&#8594;</button></div>
 	<br>
 	<div class="center_bottom">
-	<button onclick="down()"><img src="\down.png"></button></div>
-	<a href="#" class="previous round">&#8249;</a>
-    <a href="#" class="next round">&#8250;</a>
+	<button onclick="down()"><img src="\down.png">&#8595;</button></div>
   </body>
 </html>
