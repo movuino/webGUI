@@ -48,7 +48,7 @@ void onTick() {
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 {
- /* Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
+  Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
   switch(type) {
     case WStype_DISCONNECTED:
       Serial.printf("[%u] Disconnected!\r\n", num);
@@ -67,7 +67,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
           webSocket.sendTXT(num, halte, strlen(halte));
           Serial.println("movSTATUS else");
         }  */
-  /*    }
+      }
       break;
     case WStype_TEXT:
       Serial.printf("[%u] get Text: %s\r\n", num, payload);
@@ -94,18 +94,17 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       }*/
       // send data to all connected clients
       //webSocket.broadcastTXT(payload, length);  // envoie le message reçu à tous les appareils connectés
-   /*   break;
+    break;
     case WStype_BIN:
       Serial.printf("[%u] get binary length: %u\r\n", num, length);
-      hexdump(payload, length);
-
+      //hexdump(payload, length);
       // echo data back to browser
       webSocket.sendBIN(num, payload, length);
       break;
     default:
       Serial.printf("Invalid WStype [%d]\r\n", type);
       break;
-  }*/
+  }
 }
 void handleNotFound() {
   digitalWrite(led, 1);
@@ -176,7 +175,7 @@ U    server.send(200, "text/plain", "this works as well");
   server.begin();
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
-  ticker1.attach_ms(50, onTick); // le ticker s'active toutes les secondes et exécute onTick
+//  ticker1.attach_ms(50, onTick); // le ticker s'active toutes les secondes et exécute onTick
 }
 
 void loop(void) {
