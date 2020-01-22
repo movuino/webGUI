@@ -24,7 +24,7 @@
 const char *ssid = "Movuino-001";
 const char *password = "";
 
-MPU6050 accelgyro;
+MPU6050 accelgyro(0x69);
 
 int16_t ax, ay, az; 
 int16_t gx, gy, gz;
