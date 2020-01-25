@@ -21,12 +21,12 @@ const char command[] = "requestIMU";
 
 WebServer server(80);
 
-const int led = 13;
+//const int led = 13;
 WebSocketsServer webSocket = WebSocketsServer(81);
 void handleRoot() {
-  digitalWrite(led, 1);
+//  digitalWrite(led, 1);
   server.send(200, "text/plain", "hello from esp8266!");
-  digitalWrite(led, 0);
+  //digitalWrite(led, 0);
 }
 void onTick() {
 //  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
@@ -108,7 +108,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
   }*/
 }
 void handleNotFound() {
-  digitalWrite(led, 1);
+ // digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -121,12 +121,12 @@ void handleNotFound() {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
-  digitalWrite(led, 0);
+  //digitalWrite(led, 0);
 }
 
 void setup(void) {
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
+  //pinMode(led, OUTPUT);
+ // digitalWrite(led, 0);
   /*MPU6050 init*/
   Wire.begin();
   Wire.beginTransmission(MPU_addr);
@@ -170,16 +170,16 @@ U    server.send(200, "text/plain", "this works as well");
 
   server.begin();
   Serial.println("HTTP server started");*/
-   server.serveStatic("/js", SPIFFS, "/js");
-  server.serveStatic("/", SPIFFS, "/index.html");
+  // server.serveStatic("/js", SPIFFS, "/js");
+  // server.serveStatic("/", SPIFFS, "/index.html");
   
   server.begin();
-  webSocket.begin();
-  webSocket.onEvent(webSocketEvent);
-  ticker1.attach_ms(50, onTick); // le ticker s'active toutes les secondes et exécute onTick
+  //webSocket.begin();
+  //webSocket.onEvent(webSocketEvent);
+  //ticker1.attach_ms(50, onTick); // le ticker s'active toutes les secondes et exécute onTick
 }
 
 void loop(void) {
-  webSocket.loop();
+ // webSocket.loop();
   server.handleClient();
 }
