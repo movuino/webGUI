@@ -22,23 +22,31 @@ const char *ssid = "ESP32-001";
 const char *password = "yourPassword";
 
 WiFiServer server(80);
-
+ /*IPAddress ip(10,10,10,1);
+  IPAddress gateway(1,2,3,1);
+  IPAddress subnet(255,255,255,0);*/
 
 void setup() {
   //pinMode(LED_BUILTIN, OUTPUT);
-
   Serial.begin(115200);
   Serial.println();
   Serial.println("Configuring access point...");
- IPAddress ip(10,10,10,1);
-  IPAddress gateway(1,2,3,1);
-  IPAddress subnet(255,255,255,0);
-  WiFi.softAPConfig(ip, gateway, subnet);
+  WiFi.mode(WIFI_AP);
+  delay(100);
+  Serial.println("Set softAPConfig");
+  IPAddress Ip(10, 10, 10, 1);
+  IPAddress NMask(255, 255, 255, 0);
+  WiFi.softAPConfig(Ip, Ip, NMask);
+  IPAddress myIP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(myIP);
+  delay(100);
+ /* WiFi.softAPConfig(ip, gateway, subnet);
   // You can remove the password parameter if you want the AP to be open.
   WiFi.softAP(ssid);
  // IPAddress myIP = WiFi.softAPIP();
- // Serial.print("AP IP address: ");
- // Serial.println(myIP);
+ Serial.print("AP IP address: ");
+ // Serial.println(myIP);*/
   server.begin();
 
   Serial.println("Server started");

@@ -7,7 +7,7 @@
 #include<Wire.h>
 #include "FS.h"
 #include "SPIFFS.h"
-
+#define FORMAT_SPIFFS_IF_FAILED false
 Ticker ticker1;
 
 const int MPU_addr=0x69; // I2C address of the MPU-6050
@@ -23,6 +23,52 @@ WebServer server(80);
 
 const int led = 13;
 WebSocketsServer webSocket = WebSocketsServer(81);
+
+void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
+    Serial.printf("Listing directory: %s\r\n", dirname);
+
+    File root = fs.open(dirname);
+    if(!root){
+        Serial.println("- failed to open directory");
+        return;
+    }
+    if(!root.isDirectory()){
+        Serial.println(" - not a directory");
+        return;
+    }
+
+    File file = root.openNextFile();
+    while(file){
+        if(file.isDirectory()){
+            Serial.print("  DIR : ");
+            Serial.println(file.name());
+            if(levels){
+                listDir(fs, file.name(), levels -1);
+            }
+        } else {
+            Serial.print("  FILE: ");
+            Serial.print(file.name());
+            Serial.print("\tSIZE: ");
+            Serial.println(file.size());
+        }
+        file = root.openNextFile();
+    }
+}
+
+void connect_wifi(){
+    Serial.println();
+  Serial.println("Configuring access point...");
+  WiFi.mode(WIFI_AP);
+  delay(100);
+  Serial.println("Set softAPConfig");
+  IPAddress Ip(10, 10, 10, 1);
+  IPAddress NMask(255, 255, 255, 0);
+  WiFi.softAPConfig(Ip, Ip, NMask);
+  IPAddress myIP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(myIP);
+  delay(100);
+}
 void handleRoot() {
   digitalWrite(led, 1);
   server.send(200, "text/plain", "hello from esp8266!");
@@ -124,9 +170,13 @@ void handleNotFound() {
 }
 
 void setup(void) {
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
+ // pinMode(led, OUTPUT);
+ // digitalWrite(led, 0);
   /*MPU6050 init*/
+  if(!SPIFFS.begin(FORMAT_SPIFFS_IF_FAILED)){
+        Serial.println("SPIFFS Mount Failed");
+        return;
+    }
   Wire.begin();
   Wire.beginTransmission(MPU_addr);
   Wire.write(0x6B); // PWR_MGMT_1 register
@@ -134,12 +184,7 @@ void setup(void) {
   Wire.endTransmission(true); 
   /**/
   Serial.begin(115200);
-  WiFi.mode(WIFI_AP);  //need both to serve the webpage and take commands via tcp
-  IPAddress ip(10,10,10,1);
-  IPAddress gateway(1,2,3,1);
-  IPAddress subnet(255,255,255,0);
-  WiFi.softAPConfig(ip, gateway, subnet);
-  WiFi.softAP(ssid); //Access point is open
+  connect_wifi();
   /*WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println("");
@@ -169,16 +214,19 @@ U    server.send(200, "text/plain", "this works as well");
 
   server.begin();
   Serial.println("HTTP server started");*/
-   server.serveStatic("/js", SPIFFS, "/js");
+  server.serveStatic("/js", SPIFFS, "/js");
   server.serveStatic("/", SPIFFS, "/index.html");
   
   server.begin();
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
-//  ticker1.attach_ms(50, onTick); // le ticker s'active toutes les secondes et exécute onTick
+  ticker1.attach_ms(50, onTick); // le ticker s'active toutes les secondes et exécute onTick
+
 }
 
 void loop(void) {
+   //listDir(SPIFFS, "/", 0);
+   //delay(200);
   webSocket.loop();
   server.handleClient();
 }
