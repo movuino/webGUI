@@ -26,6 +26,21 @@ WebServer server(80);
 const int led = 13;
 WebSocketsServer webSocket = WebSocketsServer(81);
 
+
+void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
+  const uint8_t* src = (const uint8_t*) mem;
+  Serial.printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
+  for(uint32_t i = 0; i < len; i++) {
+    if(i % cols == 0) {
+      Serial.printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
+    }
+    Serial.printf("%02X ", *src);
+    src++;
+  }
+  Serial.printf("\n");
+}
+
+
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     Serial.printf("Listing directory: %s\r\n", dirname);
 
@@ -149,10 +164,17 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       //webSocket.broadcastTXT(payload, length);  // envoie le message reçu à tous les appareils connectés
     break;
     case WStype_BIN:
-      Serial.printf("[%u] get binary length: %u\r\n", num, length);
-      //hexdump(payload, length);
+      #ifdef VERBOSE
+        Serial.printf("[%u] get binary length: %u\r\n", num, length);
+        Serial.println(" ");
+        //hexdump(payload, length);
+        Serial.println(length);
+        Serial.println(payload[0]);
+        Serial.println(payload[1]);
+        Serial.println(payload[2]);
+      #endif
       // echo data back to browser
-      webSocket.sendBIN(num, payload, length);
+      //webSocket.sendBIN(num, payload, length);
       break;
     default:
       Serial.printf("Invalid WStype [%d]\r\n", type);
@@ -193,35 +215,6 @@ void setup(void) {
   /**/
   Serial.begin(115200);
   connect_wifi();
-  /*WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  Serial.println("");
-
-  // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-
-  if (MDNS.begin("esp32")) {
-    Serial.println("MDNS responder started");
-  }
-*/
- /* server.on("/", handleRoot);
-
-  server.on("/inline", []() {
-U    server.send(200, "text/plain", "this works as well");
-  });
-
-  server.onNotFound(handleNotFound);
-
-  server.begin();
-  Serial.println("HTTP server started");*/
   server.serveStatic("/js", SPIFFS, "/js");
   server.serveStatic("/", SPIFFS, "/index.html");
   

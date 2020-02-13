@@ -58,7 +58,6 @@ $("document").ready(function(){
 	websock.onopen = function(evt) { console.log('websock open'); };
 	websock.onclose = function(evt) { console.log('websock close'); };
 	websock.onerror = function(evt) { console.log(evt); };
-	websock.binaryType = 'arraybuffer';
 	websock.onmessage = function(evt) {
 		var dataAccel = evt.data
 		var espace = " ";
@@ -123,12 +122,11 @@ sliderServo3.oninput = function() {
 	}
 function motor(id,value) {
 	console.log("motor "+ id + " value " +value);
-	var array=[0,0,0];
+	var array[0,0,0];
 	array[0]=0;
 	array[1]=id;
 	array[2]=value;
-	var byteArray = new Uint8Array(array);
-	websock.send(byteArray.buffer);
+	websock.send(array);
     }
 function servo(id,pos) {
 	//var slider = document.getElementById("servoSlider");
@@ -136,8 +134,7 @@ function servo(id,pos) {
 	var array=[0, 0, 0];
 	array[0]=0; //servo
 	array[1]=id;
-	array[2]=pos;
-	var byteArray = new Uint8Array(array);
+	array[2]=value;
 	websock.send(array);
     }
 
