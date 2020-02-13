@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      text-align: center;
+      font-family: "Trebuchet MS", Arial;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    .slider {
+      width: 300px;
+    }
+  </style>
+  <script type="text/javascript" src="./js/jquery.min.js"></script>
+
+  
+</head>
+<body>
+  <h1>Multimotors ESP32</h1>
+  <h2>DC Motors</h2>
+
+  <input type="range" min="0" max="100" class="slider" id="motorSlider0" onchange="motor(0,this.value)"/>
+  <p><span id="motorValue0"></span></p>
+  <input type="range" min="0" max="100" class="slider" id="motorSlider1" onchange="motor(1,this.value)"/>
+  <p><span id="motorValue1"></span></p>
+  <h2>Servos</h2>
+  <input type="range" min="0" max="180" class="slider" id="servoSlider0" onchange="servo(0,this.value)"/>
+  <p><span id="servoPosition0"></span></p>
+  <input type="range" min="0" max="180" class="slider" id="servoSlider1" onchange="servo(1,this.value)"/>
+  <p><span id="servoPosition1"></span></p>
+  <input type="range" min="0" max="180" class="slider" id="servoSlider2" onchange="servo(2,this.value)"/>
+  <p><span id="servoPosition2"></span></p>
+  <input type="range" min="0" max="180" class="slider" id="servoSlider3" onchange="servo(3,this.value)"/>
+  <p><span id="servoPosition3"></span></p>
+  
+<script>
+//motors
+var sliderMotor0 = document.getElementById("motorSlider0");
+var sliderMotor1 = document.getElementById("motorSlider1");
+var motorValue0 = document.getElementById("motorValue0");
+var motorValue1 = document.getElementById("motorValue1");
+
+//Servos
+var sliderServo0 = document.getElementById("servoSlider0");
+var sliderServo1 = document.getElementById("servoSlider1");
+var sliderServo2 = document.getElementById("servoSlider2");
+var sliderServo3 = document.getElementById("servoSlider3");
+var servoPosition0 = document.getElementById("servoPosition0");
+var servoPosition1 = document.getElementById("servoPosition1");
+var servoPosition2 = document.getElementById("servoPosition2");
+var servoPosition3 = document.getElementById("servoPosition3");
+
+sliderMotor0.value=0;
+sliderMotor1.value=0;
+sliderServo0.value=0;
+sliderServo1.value=0;
+sliderServo2.value=0;
+sliderServo3.value=0;
+
+motorValue0.innerHTML = sliderMotor0.value;
+motorValue1.innerHTML = sliderMotor1.value;
+servoPosition0.innerHTML  = sliderServo0.value;
+servoPosition1.innerHTML  = sliderServo1.value;
+servoPosition2.innerHTML  = sliderServo2.value;
+servoPosition3.innerHTML  = sliderServo3.value;
+
+
+sliderMotor0.oninput = function() {
+    sliderMotor0.value = this.value;
+    motorValue0.innerHTML = this.value;
+	}
+sliderMotor1.oninput = function() {
+    sliderMotor1.value = this.value;
+    motorValue1.innerHTML = this.value;
+	}
+sliderServo0.oninput = function() {
+    sliderServo0.value = this.value;
+    servoPosition0.innerHTML = this.value;
+	}
+sliderServo1.oninput = function() {
+    sliderServo1.value = this.value;
+    servoPosition1.innerHTML = this.value;
+	}
+sliderServo2.oninput = function() {
+    sliderServo2.value = this.value;
+    servoPosition2.innerHTML = this.value;
+	}
+sliderServo3.oninput = function() {
+    sliderServo3.value = this.value;
+    servoPosition3.innerHTML = this.value;
+	}
+	
+	
+function motor(id,value) {
+	console.log("motor "+ id + " value " +value);
+    }
+function servo(id,pos) {
+	//var slider = document.getElementById("servoSlider");
+	console.log("Servo "+id+" position: "+ pos);
+    }
+</script>
+</body>
+</html>
