@@ -122,7 +122,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       Serial.printf("[%u] Disconnected!\r\n", num);
       break;
     case WStype_CONNECTED:
-      {
+    {
         IPAddress ip = webSocket.remoteIP(num);
         Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\r\n", num, ip[0], ip[1], ip[2], ip[3], payload);
         // payload = contenu du message envoyé
@@ -135,9 +135,10 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
           webSocket.sendTXT(num, halte, strlen(halte));
           Serial.println("movSTATUS else");
         }  */
-      }
-      break;
+    }
+    break;
     case WStype_TEXT:
+    {
       Serial.printf("[%u] get Text: %s\r\n", num, payload);
       //received request of datza
       if (strcmp(command, (const char *)payload) == 0) {
@@ -162,9 +163,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       }*/
       // send data to all connected clients
       //webSocket.broadcastTXT(payload, length);  // envoie le message reçu à tous les appareils connectés
+    }
     break;
     case WStype_BIN:
-      #ifdef VERBOSE
+    {
+     Serial.printf("[%u] get binary length: %u\r\n", num, length);
+      /*#ifdef VERBOSE
         Serial.printf("[%u] get binary length: %u\r\n", num, length);
         Serial.println(" ");
         //hexdump(payload, length);
@@ -172,13 +176,30 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
         Serial.println(payload[0]);
         Serial.println(payload[1]);
         Serial.println(payload[2]);
-      #endif
+      #endif*/
+      int outputType = payload[0];
+      int outputId = payload[1];
+      int outputValue = payload[2];      
+      //motor frame 
+      if(outputType==0){
+         if(outputId==0){
+           Serial.print("Left motor ");
+           Serial.print(outputValue);
+           Serial.println(" %");
+         }
+         else if(outputId==1){
+           Serial.print("Right motor ");
+           Serial.print(outputValue);
+           Serial.println(" %");
+         }
+      }
       // echo data back to browser
       //webSocket.sendBIN(num, payload, length);
+   }
       break;
-    default:
+   default:
       Serial.printf("Invalid WStype [%d]\r\n", type);
-      break;
+   break;
   }
 }
 void handleNotFound() {
