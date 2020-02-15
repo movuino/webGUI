@@ -1,0 +1,50 @@
+    .directionswitch {
+        position: relative; 
+		margin-left:auto;
+        margin-right:auto;
+		width: 90px;
+        -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+		
+    }
+    .directionswitch-checkbox {
+        display: none;
+    }
+    .directionswitch-label {
+        display: block; overflow: hidden; cursor: pointer;
+        border: 2px solid #999999; border-radius: 20px;
+    }
+    .directionswitch-inner {
+        display: block; width: 200%; margin-left: -100%;
+        transition: margin 0.3s ease-in 0s;
+    }
+    .directionswitch-inner:before, .directionswitch-inner:after {
+        display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+        font-size: 11px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+        box-sizing: border-box;
+    }
+    .directionswitch-inner:before {
+        content: "Forward";
+        padding-left: 5px;
+        background-color: #E3DFD6; color: #FFFFFF;
+    }
+    .directionswitch-inner:after {
+        content: "Reverse";
+        padding-right: 5px;
+        background-color: #E3DFD6; color: #FCF7F7;
+        text-align: right;
+    }
+    .directionswitch-switch {
+        display: block; width: 24px; margin: 3px;
+        background: #F4FF1F;
+        position: absolute; top: 0; bottom: 0;
+        right: 56px;
+        border: 2px solid #999999; border-radius: 20px;
+        transition: all 0.3s ease-in 0s; 
+    }
+    .directionswitch-checkbox:checked + .directionswitch-label .directionswitch-inner {
+        margin-left: 0;
+    }
+    .directionswitch-checkbox:checked + .directionswitch-label .directionswitch-switch {
+        right: 0px; 
+        background-color: #60CC26; 
+    } 

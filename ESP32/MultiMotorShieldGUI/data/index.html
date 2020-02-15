@@ -13,7 +13,10 @@
     .slider {
       width: 300px;
     }
+	
   </style>
+  <link rel="stylesheet" type="text/css" href="./css/directionswitch.css">
+  <link rel="stylesheet" type="text/css" href="./css/onoffswitch.css">
   <script type="text/javascript" src="./js/jquery.min.js"></script>
   <script type="text/javascript">
 
@@ -24,9 +27,22 @@
 <body>
   <h1>Multimotors ESP32</h1>
   <h2>DC Motors</h2>
-
+  <div class="directionswitch">
+        <input type="checkbox" name="onoffswitch0" class="directionswitch-checkbox" id="directionswitch0" checked>
+        <label class="directionswitch-label" for="directionswitch0">
+            <span class="directionswitch-inner"></span>
+            <span class="directionswitch-switch"></span>
+        </label>
+    </div>
   <input type="range" min="0" max="100" class="slider" id="motorSlider0" onchange="motor(0,this.value)"/>
   <p><span id="motorValue0"></span></p>
+  <div class="directionswitch">
+        <input type="checkbox" name="onoffswitch1" class="directionswitch-checkbox" id="directionswitch1" checked>
+        <label class="directionswitch-label" for="directionswitch1">
+            <span class="directionswitch-inner"></span>
+            <span class="directionswitch-switch"></span>
+        </label>
+  </div>
   <input type="range" min="0" max="100" class="slider" id="motorSlider1" onchange="motor(1,this.value)"/>
   <p><span id="motorValue1"></span></p>
   <h2>Servos</h2>
@@ -38,9 +54,20 @@
   <p><span id="servoPosition2"></span></p>
   <input type="range" min="0" max="180" class="slider" id="servoSlider3" onchange="servo(3,this.value)"/>
   <p><span id="servoPosition3"></span></p>
+  <h2>LED</h2>
+  <div class="onoffswitch">
+        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
+        <label class="onoffswitch-label" for="myonoffswitch">
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+        </label>
+  </div>
   
 <script>
 //Websockets
+var motor0Direction=true;
+var motor1Direction=true;
+
 function splitString(stringToSplit, separator) {
 	var arrayOfStrings = stringToSplit.split(separator);
 	//for (var i=0; i < arrayOfStrings.length; i++)
@@ -66,6 +93,18 @@ $("document").ready(function(){
 		console.log(evt);
 		};  
 	});
+
+//change function for toggle switches
+$('#directionswitch0').change(function () {
+   motor0Direction=!motor0Direction;
+   console.log(motor0Direction);
+ });
+ 
+$('#directionswitch1').change(function () {
+    motor1Direction=!motor1Direction;
+	console.log(motor1Direction);
+ });
+
 //motors
 var sliderMotor0 = document.getElementById("motorSlider0");
 var sliderMotor1 = document.getElementById("motorSlider1");
@@ -122,11 +161,13 @@ sliderServo3.oninput = function() {
     servoPosition3.innerHTML = this.value;
 	}
 function motor(id,value) {
-	console.log("motor "+ id + " value " +value);
-	var array=[0,0,0];
+	//console.log("motor "+ id + " value " +value);
+	var array=[0,0,0,0];
 	array[0]=0;
 	array[1]=id;
-	array[2]=value;
+	array[2]=motor0Direction;
+	array[3]=value;
+	console.log(array);
 	var byteArray = new Uint8Array(array);
 	websock.send(byteArray.buffer);
     }

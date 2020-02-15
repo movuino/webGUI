@@ -179,18 +179,23 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       #endif*/
       int outputType = payload[0];
       int outputId = payload[1];
-      int outputValue = payload[2];      
+      bool outputDirection = payload[2];
+      int outputValue = payload[3];      
       //motor frame 
       if(outputType==0){
          if(outputId==0){
            Serial.print("Left motor ");
            Serial.print(outputValue);
-           Serial.println(" %");
+           Serial.print(" % ");
+           if (outputDirection) Serial.println("Forward");
+           else Serial.println("Reverse");
          }
          else if(outputId==1){
            Serial.print("Right motor ");
            Serial.print(outputValue);
            Serial.println(" %");
+           if (outputDirection) Serial.println("Forward");
+           else Serial.println("Reverse");
          }
       }
       // echo data back to browser
@@ -236,6 +241,7 @@ void setup(void) {
   /**/
   Serial.begin(115200);
   connect_wifi();
+  server.serveStatic("/css", SPIFFS, "/css");
   server.serveStatic("/js", SPIFFS, "/js");
   server.serveStatic("/", SPIFFS, "/index.html");
   
