@@ -1,0 +1,12 @@
+.icon_arrow-down{
+  background-image : url(../img/arrow-down.svg);
+  background-size: cover;
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+}
+.fill_img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
