@@ -15,6 +15,9 @@
     }
   </style>
   <script type="text/javascript" src="./js/jquery-3.5.1.min.js"></script>
+   <link rel="stylesheet" type="text/css" href="./css/onoffswitch.css">
+   <link rel="stylesheet" href="./css/fontawesome.css" media="screen">
+     <link rel="stylesheet" href="./css/solid.css" media="screen">
   <link rel="stylesheet" href="./css/bootstrap.min.css" media="screen">
   <link rel="stylesheet" href="./css/styles.css" media="screen">
   <script type="text/javascript" src="./js/bootstrap.bundle.min.js"></script>
@@ -24,49 +27,208 @@
   <div class="row" style="height: 75px;">
    <h1 class=" col h4 text-center">Movuino Shitty Robot</h4>
   </div>
-  <div class="row bg-light" style="height: 50px;">
+  <div class="row" style="height: 50px;">
   </div>
-  <div class="row bg-info" style="height: 75px;">
-	<div class="col bg-light"> </div>
-	<div class="col bg-light"> </div>
-	<div class="col text-center">UP</div>
-	<div class="col bg-light"> </div>
-	<div class="col bg-light"> </div>
+  <div class="row">
+	<div class="col"></div>
+	<button  class=" col col-md-2 btn btn-white" id="btn-up" onclick="this.blur();">
+		<i class="fas fa-arrow-up fa-3x"></i>
+	</button>
+	<div class="col"></div>
   </div>
-  <div class="row bg-light text-center" style="height: 75px;">
-	<div class="col bg-primary"> </div><div class="col bg-light">1</div><div class="col bg-info"> </div><div class="col bg-light">2</div><div class="col bg-primary"> </div>
+  <div class="row " >
+	<div class="col"> </div>
+	<button type="button" class="col col-md-2 btn btn-white" id="btn-left" onclick="this.blur();">
+		<i class="fas fa-arrow-left fa-3x"></i>
+	</button>
+	<button class="col col-md-2 btn btn-white" id="btn-stop" onclick="this.blur();">
+		<i class="fas fa-stop-circle fa-3x"></i>
+	</button>
+	<button type="button" class="col col-md-2 btn btn-white" id="btn-right" onclick="this.blur();" >
+		<i class="fas fa-arrow-right fa-3x"></i>
+	</button>
+	<div class="col"> </div>
   </div>
-  <div class="row bg-danger align-center" style="height: 75px;">
-	<div class="col bg-light"> </div>
-	<div class="col bg-light"> </div>
-	<div class="col">
-		<button type="button" class="btn-primary" id="btn-down" onclick="this.blur();">
-		<!-- <i class="icon_arrow-down"></i>-->
-		<img src="./img/arrow-down.svg" class="fill_img" alt="" title="arrow">
-		</button>
-	</div>
-	<div class="col bg-light"> </div>
-	<div class="col bg-light"> </div>
+  <div class="row">
+	<div class="col"> </div>
+	<div class="col"> </div>
+	<button type="button" class="col col-md-2 btn btn-white" id="btn-down" onclick="this.blur();">
+		<i class="fas fa-arrow-down fa-3x"></i>
+	</button>
+	<!--</div>-->
+	<div class="col "> </div>
+	<div class="col"> </div>
   </div>
-  <p>Position: <span id="servoPos"></span></p>
-  <input type="range" min="0" max="180" class="slider" id="servoSlider" onchange="servo(this.value)"/>
-</div>
+  <div class="row align-center text-center" style="height: 30px;">
+  </div>
+  <div class="row align-center text-center" style="height: 50px;">
+	<div class="col"><b>Speed: </b><span id="speedValue"></span></div>
+  </div>
+  <div class="row align-center text-center" style="height: 50px;">
+	<div class="col"><input type="range" min="0" max="100" class="slider" id="speedSlider" /></div>
+  </div>
 <script>
-$( "#btn-down" ).click(function() {
- console.log("toto");
-});
-var slider = document.getElementById("servoSlider");
-var servoP = document.getElementById("servoPos");
-slider.value=0;
-servoP.innerHTML = slider.value;
-slider.oninput = function() {
-    slider.value = this.value;
-    servoP.innerHTML = this.value;
+$("document").ready(function(){
+	//console.log("hola");
+	websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+	websock.onopen = function(evt) { console.log('websock open'); };
+	websock.onclose = function(evt) { console.log('websock close'); };
+	websock.onerror = function(evt) { console.log(evt); };
+	websock.binaryType = 'arraybuffer';
+	websock.onmessage = function(evt) {
+		var dataAccel = evt.data
+		var espace = " ";
+		splitString(dataAccel, espace);
+		console.log(evt);
+		};  
+	
+	$( "#btn-down" ).click(function() {
+		console.log("down");
+		sendCommand(2,speedSlider.value);
+		});
+	$( "#btn-up" ).click(function() {
+		console.log("up");
+		console.log("speed:"+speedSlider.value);
+		sendCommand(1,speedSlider.value);
+		});
+	$( "#btn-left" ).click(function() {
+		console.log("left");
+		sendCommand(3,speedSlider.value);
+		});
+	$( "#btn-right" ).click(function() {
+		console.log("right");
+		sendCommand(4,speedSlider.value);
+		});
+	$( "#btn-stop" ).click(function() {
+		console.log("stop");
+		sendCommand(0,0);
+		speedSlider.value=0;
+		speedValue.innerHTML = 0;
+		});
+	
+	});
+
+function sendCommand(command,value) {
+	//console.log("motor "+ id + " value " +value);
+	var array=[0,0,0];
+	array[0]=0;
+	array[1]=command;
+	array[2]=value;
+	console.log(array);
+	var byteArray = new Uint8Array(array);
+	websock.send(byteArray.buffer);
     }
-function servo(pos) {
-	var slider = document.getElementById("servoSlider");
-	console.log(slider.value);
+
+function splitString(stringToSplit, separator) {
+	var arrayOfStrings = stringToSplit.split(separator);
+	//for (var i=0; i < arrayOfStrings.length; i++)
+	//print(arrayOfStrings[i] + " / ");
+    bpm=arrayOfStrings[1];
+	//ax = arrayOfStrings[1];
+	//ay = arrayOfStrings[2];
+	//az = arrayOfStrings[3];
+	//b.innerHTML = "<p> ax = " + ax + " , ay = " + ay + " , az = " + az + "</p>";	
+	}	
+
+
+
+//change function for toggle switches
+/*$('#directionswitch0').change(function () {
+   motor0Direction=!motor0Direction;
+   console.log(motor0Direction);
+ });
+ 
+$('#directionswitch1').change(function () {
+    motor1Direction=!motor1Direction;
+	console.log(motor1Direction);
+ });
+
+//motors
+var sliderMotor0 = document.getElementById("motorSlider0");
+var sliderMotor1 = document.getElementById("motorSlider1");
+var motorValue0 = document.getElementById("motorValue0");
+var motorValue1 = document.getElementById("motorValue1");
+
+//Servos
+var sliderServo0 = document.getElementById("servoSlider0");
+var sliderServo1 = document.getElementById("servoSlider1");
+var sliderServo2 = document.getElementById("servoSlider2");
+var sliderServo3 = document.getElementById("servoSlider3");
+var servoPosition0 = document.getElementById("servoPosition0");
+var servoPosition1 = document.getElementById("servoPosition1");
+var servoPosition2 = document.getElementById("servoPosition2");
+var servoPosition3 = document.getElementById("servoPosition3");
+
+sliderMotor0.value=0;
+sliderMotor1.value=0;
+sliderServo0.value=0;
+sliderServo1.value=0;
+sliderServo2.value=0;
+sliderServo3.value=0;
+
+motorValue0.innerHTML = sliderMotor0.value;
+motorValue1.innerHTML = sliderMotor1.value;
+servoPosition0.innerHTML  = sliderServo0.value;
+servoPosition1.innerHTML  = sliderServo1.value;
+servoPosition2.innerHTML  = sliderServo2.value;
+servoPosition3.innerHTML  = sliderServo3.value;
+
+
+sliderMotor0.oninput = function() {
+    sliderMotor0.value = this.value;
+    motorValue0.innerHTML = this.value;
+	}
+sliderMotor1.oninput = function() {
+    sliderMotor1.value = this.value;
+    motorValue1.innerHTML = this.value;
+	}
+sliderServo0.oninput = function() {
+    sliderServo0.value = this.value;
+    servoPosition0.innerHTML = this.value;
+	}
+sliderServo1.oninput = function() {
+    sliderServo1.value = this.value;
+    servoPosition1.innerHTML = this.value;
+	}
+sliderServo2.oninput = function() {
+    sliderServo2.value = this.value;
+    servoPosition2.innerHTML = this.value;
+	}
+sliderServo3.oninput = function() {
+    sliderServo3.value = this.value;
+    servoPosition3.innerHTML = this.value;
+	}
+function motor(id,value) {
+	//console.log("motor "+ id + " value " +value);
+	var array=[0,0,0,0];
+	array[0]=0;
+	array[1]=id;
+	array[2]=motor0Direction;
+	array[3]=value;
+	console.log(array);
+	var byteArray = new Uint8Array(array);
+	websock.send(byteArray.buffer);
     }
+function servo(id,pos) {
+	//var slider = document.getElementById("servoSlider");
+	console.log("Servo "+id+" position: "+ pos);
+	var array=[0, 0, 0];
+	array[0]=0; //servo
+	array[1]=id;
+	array[2]=pos;
+	var byteArray = new Uint8Array(array);
+	websock.send(array);
+    }*/
+var speedSlider = document.getElementById("speedSlider");
+var speedValue = document.getElementById("speedValue");
+speedSlider.value=50;
+speedValue.innerHTML = speedSlider.value;
+speedSlider.oninput = function() {
+    speedSlider.value = this.value;
+    speedValue.innerHTML = this.value;
+	console.log("speed changed to : "+this.value);
+    }
+
 </script>
 </body>
 </html>

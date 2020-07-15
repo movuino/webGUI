@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+  <head>
+  <style>
+	body {
+		background-color: white;
+		}
+
+	h1 {
+		color : blue;
+		font-family: arial;
+		font-size: 200%;
+		text-align:center;
+		}
+    hbpm {
+		color : black;
+		font-family: arial;
+		font-size: 500%;
+		text-align:center;
+		}
+	#canvas-container {
+		width: 100%;
+		text-align:center;
+		}
+
+	canvas {
+		display: inline;
+		}
+   </style>  
+   <script type="text/javascript" src="/js/smoothie.js"></script>
+   <script type="text/javascript" src="/js/jquery.min.js"></script>
+   <script type="text/javascript" src="/js/rangeslider.min.js"></script>
+   <script>
+    // Initialize a new plugin instance for all
+    // e.g. $('input[type="range"]') elements.
+    $('input[type="range"]').rangeslider();
+
+    // Destroy all plugin instances created from the
+    // e.g. $('input[type="range"]') elements.
+    $('input[type="range"]').rangeslider('destroy');
+
+    // Update all rangeslider instances for all
+    // e.g. $('input[type="range"]') elements.
+    // Usefull if you changed some attributes e.g. `min` or `max` etc.
+    $('input[type="range"]').rangeslider('update', true);
+    </script>
+    <script type="text/javascript">
+	
+	var ax;
+	var ay;
+	var az;
+	var bpm;
+	
+	function splitString(stringToSplit, separator) {
+		var arrayOfStrings = stringToSplit.split(separator);
+		//for (var i=0; i < arrayOfStrings.length; i++)
+		//print(arrayOfStrings[i] + " / ");
+        bpm=arrayOfStrings[1];
+		//ax = arrayOfStrings[1];
+		//ay = arrayOfStrings[2];
+		//az = arrayOfStrings[3];
+		//b.innerHTML = "<p> ax = " + ax + " , ay = " + ay + " , az = " + az + "</p>";	
+		}	
+		
+
+    function startSockets() {
+		websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+		websock.onopen = function(evt) { console.log('websock open'); };
+		websock.onclose = function(evt) { console.log('websock close'); };
+	//	websock.onmessage = function(evt) {console.log(evt);};
+		websock.onerror = function(evt) { console.log(evt); };
+		websock.onmessage = function(evt) {
+		var dataAccel = evt.data
+		var espace = " ";
+		splitString(dataAccel, espace);
+		console.log(evt);
+
+		};  
+		}
+
+		
+	
+		
+	  // Randomly add a data point every 500ms
+//      var random = new TimeSeries();
+	  Serie_bpm = new TimeSeries();
+	 // Serieay = new TimeSeries();
+	  //Serieaz = new TimeSeries();
+	  
+      setInterval(function() {
+		// Call a function repetatively with 5 Second interval
+		getData();
+		websock.send("requestIMU");
+		}, 100); //100mSeconds update rate
+      
+      function createTimeline() {
+		startSockets();
+        //var chart = new SmoothieChart();
+		var chart = new SmoothieChart({millisPerPixel:40,scaleSmoothing:0.057,grid:{fillStyle:'#f5f4f7',sharpLines:true,millisPerLine:4000,verticalSections:7},maxValue:200,minValue:10});
+//        chart.addTimeSeries(random, { strokeStyle: 'rgba(255, 255, 255, 1)', fillStyle: 'rgba(0, 0, 0, 0.2)', lineWidth: 2 });
+		chart.addTimeSeries(Serie_bpm, {lineWidth:2,strokeStyle:'#0000ff'});
+		/*chart.addTimeSeries(Serieax, { strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.2)', lineWidth: 2 });
+		chart.addTimeSeries(Serieay, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 });
+		chart.addTimeSeries(Serieaz, { strokeStyle: 'rgba(0, 0, 255, 1)', fillStyle: 'rgba(0, 0, 255, 0.2)', lineWidth: 2 });*/
+        chart.streamTo(document.getElementById("chart"), 50);
+      }
+	  
+	function getData() {
+		Serie_bpm.append(new Date().getTime(),bpm);
+		/*Serieax.append(new Date().getTime(),ax);
+		Serieay.append(new Date().getTime(),ay);
+		Serieaz.append(new Date().getTime(),az);*/
+	    document.getElementById("bpm").innerHTML = bpm;
+		}
+    </script>
+  </head>
+  <body onload="createTimeline();javascript:start();">
+    <h1>Open health Band (beta) </h1>
+    <hbpm> <p id="bpm"></p></hbpm>
+	<br>
+	<div id="canvas-container">
+    <canvas id="chart" width="400" height="100"></canvas>
+	<div>
+	<input
+    type="range"
+    min="0"                    // default 0
+    max="180"                  // default 100
+    step="1"                   // default 1
+    value="0"                 // default min + (max-min)/2
+    data-orientation="horizontal" // default horizontal
+	>
+</html>
